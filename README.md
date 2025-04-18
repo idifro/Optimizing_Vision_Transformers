@@ -35,7 +35,6 @@ Our experiments demonstrate significant reductions in model size, FLOPs, and pow
 | Pruned_40     | 0.7038   | 0.00 MB      | 726.25 MB     | 5.98          | 16,714.57            | 0.44 GFLOPs | 7.02 Million   | 69.00              |
 | Pruned_40_KD  | 0.8081   | 0.00 MB      | 726.25 MB     | 5.50          | 18,165.42            | 0.44 GFLOPs | 7.02 Million   | 67.01              |
 | Student_KD    | 0.7645   | 0.00 MB      | 407.26 MB     | 4.60          | 21,731.78            | 0.10 GFLOPs | 1.66 Million   | 64.48              |
-s
 ---
 
 ### 📉 % Change Compared to Baseline
