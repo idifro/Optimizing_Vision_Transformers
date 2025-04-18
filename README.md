@@ -17,8 +17,8 @@ Our experiments demonstrate significant reductions in model size, FLOPs, and pow
 
 - `train_cifar10.py` — Baseline ViT training script on CIFAR-10
 - `vitprune.py` — Structured pruning implementation with `channel_selection`
-- `distill_pruned.py` — Knowledge distillation from baseline to pruned ViT
-- `metrics.py` — Evaluation utilities for measuring latency, FLOPs, model size, etc.
+- `vit_knowledge_distillation.py` — Knowledge distillation from baseline to pruned ViT
+- `vit_evaluation.py` — Evaluation utilities for measuring latency, FLOPs, model size, etc.
 - `README.md` — You're here!
 
 ---
@@ -27,26 +27,26 @@ Our experiments demonstrate significant reductions in model size, FLOPs, and pow
 
 ### 🧪 Metrics Comparison
 
-| Model                                              | Accuracy | Latency (ms) | Speed (samples/sec) | Model Size (MB) | Memory (MB) | FLOPs (GFLOPs) | Parameters (M) | Power (W) |
-|---------------------------------------------------|----------|--------------|----------------------|------------------|-------------|----------------|----------------|-----------|
-| **Baseline ViT**                                  | 78.33%   | 2.17         | 461.39               | 39.20            | 1546.10     | 0.62           | 9.75           | 28.46     |
-| **Pruned 20%**                                     | 71.50%   | 1.99         | 501.33               | 34.15            | 1546.28     | 0.54           | 8.50           | 26.83     |
-| **Pruned 30%**                                     | 70.93%   | 1.95         | 511.57               | 31.49            | 1559.09     | 0.49           | 7.83           | 25.18     |
-| **Pruned 40%**                                     | 69.25%   | 1.94         | 516.20               | 28.24            | 1625.50     | 0.44           | 7.02           | 22.68     |
-| **Pruned 40% + KD Fine-tuned**                    | 80.67%   | 1.88         | 531.63               | 28.27            | 1627.34     | 0.44           | 7.02           | 18.94     |
-| **KD: Reduced Dim + Depth + Heads (Tiny ViT)**    | 77.64%   | 1.32         | 755.03               | 6.75             | 1290.65     | 0.10           | 1.66           | 7.82      |
-
+| Model         | Accuracy | CPU Mem Diff | GPU Mem Diff | Latency (ms) | Speed (samples/sec) | FLOPs       | Parameters     | Avg GPU Power (W) |
+|---------------|----------|--------------|---------------|---------------|----------------------|-------------|----------------|--------------------|
+| baseline_vit  | 0.8035   | 0.00 MB      | 1158.83 MB    | 10.85         | 9,218.05             | 0.62 GFLOPs | 9.75 Million   | 68.42              |
+| Pruned_20     | 0.7192   | 0.00 MB      | 794.02 MB     | 8.35          | 11,975.93            | 0.54 GFLOPs | 8.50 Million   | 68.75              |
+| Pruned_30     | 0.7133   | 0.00 MB      | 762.45 MB     | 5.91          | 16,916.51            | 0.49 GFLOPs | 7.83 Million   | 67.36              |
+| Pruned_40     | 0.7038   | 0.00 MB      | 726.25 MB     | 5.98          | 16,714.57            | 0.44 GFLOPs | 7.02 Million   | 69.00              |
+| Pruned_40_KD  | 0.8081   | 0.00 MB      | 726.25 MB     | 5.50          | 18,165.42            | 0.44 GFLOPs | 7.02 Million   | 67.01              |
+| Student_KD    | 0.7645   | 0.00 MB      | 407.26 MB     | 4.60          | 21,731.78            | 0.10 GFLOPs | 1.66 Million   | 64.48              |
+s
 ---
 
 ### 📉 % Change Compared to Baseline
+| Model         | Accuracy (%) | CPU Mem Diff (%) | GPU Mem Diff (%) | Latency (%) | Speed (%) | FLOPs (%) | Parameters (%) | Avg GPU Power (%) |
+|---------------|--------------|------------------|-------------------|-------------|------------|------------|-----------------|--------------------|
+| Pruned_20     | -10.50       | 0.00             | -31.48            | -23.05      | +29.89     | -12.90     | -12.82          | +0.48              |
+| Pruned_30     | -11.23       | 0.00             | -34.19            | -45.53      | +83.52     | -20.97     | -19.69          | -1.55              |
+| Pruned_40     | -12.42       | 0.00             | -37.33            | -44.87      | +81.31     | -29.03     | -27.95          | +0.85              |
+| Pruned_40_KD  | +0.57        | 0.00             | -37.33            | -49.30      | +97.02     | -29.03     | -27.95          | -2.06              |
+| Student_KD    | -4.86        | 0.00             | -64.84            | -57.58      | +135.74    | -83.87     | -82.97          | -5.75              |
 
-| Model                                              | Accuracy Δ | Latency Δ | Speed Δ         | Model Size Δ | Memory Δ    | FLOPs Δ     | Params Δ     | Power Δ     |
-|---------------------------------------------------|------------|-----------|------------------|---------------|--------------|--------------|---------------|-------------|
-| **Pruned 20%**                                     | 🔽 -8.71%  | 🔽 -8.29% | 🔼 +8.66%        | 🔽 -12.88%    | 🔼 +0.01%    | 🔽 -12.90%   | 🔽 -12.82%    | 🔽 -5.73%    |
-| **Pruned 30%**                                     | 🔽 -9.44%  | 🔽 -10.14%| 🔼 +10.88%       | 🔽 -19.67%    | 🔼 +0.84%    | 🔽 -20.97%   | 🔽 -19.69%    | 🔽 -11.52%   |
-| **Pruned 40%**                                     | 🔽 -11.61% | 🔽 -10.60%| 🔼 +11.88%       | 🔽 -27.96%    | 🔼 +5.14%    | 🔽 -29.03%   | 🔽 -27.90%    | 🔽 -20.32%   |
-| **Pruned 40% + KD Fine-tuned**                    | 🔼 +2.99%  | 🔽 -13.36%| 🔼 +15.23%       | 🔽 -27.89%    | 🔼 +5.25%    | 🔽 -29.03%   | 🔽 -27.90%    | 🔽 -33.45%   |
-| **KD: Reduced Dim + Depth + Heads**    | 🔽 -0.88%  | 🔽 -39.17%| 🔼 +63.68%       | 🔽 -82.78%    | 🔽 -16.51%   | 🔽 -83.87%   | 🔽 -82.97%    | 🔽 -72.51%   |
 
 ---
 
@@ -54,7 +54,6 @@ Our experiments demonstrate significant reductions in model size, FLOPs, and pow
 
 - ✅ **Knowledge Distillation** can recover or improve performance after pruning.
 - 💡 **Reduced dim ViT with KD** deliver excellent speed/efficiency for edge deployment.
-- 🔍 Our pruning method achieves up to **28% model size reduction** with minimal accuracy loss.
 - 🧪 Detailed evaluation includes accuracy, latency, throughput, FLOPs, memory, and power estimation.
 
 ---

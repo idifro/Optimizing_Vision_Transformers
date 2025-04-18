@@ -174,6 +174,9 @@ def test(epoch, student,scheduler,optimizer):
         if not os.path.isdir('checkpoint'):
             os.mkdir('checkpoint')
         torch.save(state, './checkpoint/'+'vit-4-'+'ckpt_student_kt.t7')
+        # student.train()
+        torch.save(student,"checkpoint/model_student_kd.pth")
+        # student.eval()
         best_acc = acc
     
     os.makedirs("log", exist_ok=True)
